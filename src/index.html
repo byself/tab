@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>选项卡切换 + 图片轮播</title>
+
+    <style>
+
+
+        .tabBox{
+            margin-left: auto;
+            margin-right: auto;
+            width: 660px;
+        }
+        .tabs{
+            text-align: center;
+        }
+
+        .tabs a{
+            margin: 0 10px;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        .tabs a.on,
+        .tabs a:hover{
+            color: dodgerblue;
+        }
+
+        .tabItems{
+            position: relative;
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+        }
+
+        .tabSlideBox{
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 120px;
+        }
+
+        .tabItem{
+            display: none;
+            overflow: hidden;
+        }
+
+        .tabItem .card{
+            float: left;
+            margin: 10px;
+            width: 200px;
+            height: 100px;
+            text-align: center;
+            background-color:dodgerblue;
+        }
+
+        .tabItems .prev,
+        .tabItems .next{
+            position: absolute;
+            top: 50%;
+            margin-top: -15px;
+            width: 30px;
+            height: 30px;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            background-color: rgba(204,165,73,0.86);
+        }
+
+        .tabItems .prev{
+            left: 0;
+        }
+
+        .tabItems .next{
+            right: 0;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <div class="tabBox">
+        <div class="tabs" id="tabs">
+            <a href="javascript:void(0)">上海</a>
+            <a href="javascript:void(0)">杭州</a>
+            <a href="javascript:void(0)">北京</a>
+            <a href="javascript:void(0)">深圳</a>
+        </div>
+        <div class="tabItems" id="tabItems">
+            <div class="tabSlideBox">
+                <div class="tabItem">
+                    <div class="card">1</div>
+                    <div class="card">2</div>
+                    <div class="card">3</div>
+                    <div class="card">4</div>
+                    <div class="card">5</div>
+                    <div class="card">6</div>
+                </div>
+                <div class="tabItem">
+                    <div class="card">21</div>
+                    <div class="card">2</div>
+                    <div class="card">3</div>
+                    <div class="card">4</div>
+                    <div class="card">5</div>
+                    <div class="card">6</div>
+                </div>
+                <div class="tabItem">
+                    <div class="card">31</div>
+                    <div class="card">2</div>
+                    <div class="card">3</div>
+                    <div class="card">4</div>
+                    <div class="card">5</div>
+                    <div class="card">6</div>
+                </div>
+                <div class="tabItem">
+                    <div class="card">41</div>
+                    <div class="card">2</div>
+                    <div class="card">3</div>
+                    <div class="card">4</div>
+                    <div class="card">5</div>
+                    <div class="card">6</div>
+                </div>
+            </div>
+            <a class="prev" href="javascript:void(0)"><</a>
+            <a class="next" href="javascript:void(0)">></a>
+        </div>
+    </div>
+
+
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script>
+
+        var timer = null;
+
+        function tab(){
+            var $tabs = $("#tabs");
+            var $tabItems = $("#tabItems");
+
+            $tabItems.find(".tabItem").eq(0).show();
+
+            $tabs.on("click", "a", function(){
+                clearInterval(timer);
+                var $a = $(this);
+                var index = $a.index();
+                $a.addClass("on").siblings().removeClass("on");
+                $tabItems.find(".tabItem").eq(index).show().siblings().hide();
+
+                slide(index);
+            });
+
+
+            slide(0);
+        }
+
+        function slide(index){
+            var $box = $("#tabItems");
+            var $slideBox = $(".tabSlideBox", $box);
+            var $currentTabItem = $(".tabItem", $box).eq(index);
+            var $card = $(".card", $currentTabItem).eq(0);
+            var $prev = $(".prev", $box);
+            var $next = $(".next", $box);
+
+            var isSlide = false;
+
+            var cardNum = $(".card", $currentTabItem).length;
+            var cardWidth = $card.outerWidth(true);
+            var cardHeight = $card.outerHeight(true);
+
+            $slideBox.width(cardNum * cardWidth);
+
+            // 滚动次数
+            var count = 0;
+
+            // 滚动速度
+            var speed = 1000;
+
+            //动画间隔时间
+            var duration = 2000;
+
+            /*
+             * @param direction  1 :右移  -1：左移
+             **/
+            var move = function(direction, callback){
+                var left = direction * cardWidth;
+
+            };
+
+            var prev = function(){
+                var $lastCard = $(".card", $currentTabItem).eq(cardNum - 1);
+                $currentTabItem.prepend($lastCard.clone(true));
+                $lastCard.remove();
+                $slideBox.css("left", -cardWidth);
+
+                $slideBox.animate({"left": 0}, speed, function(){
+                    isSlide = false;
+                    autoplay();
+                });
+            };
+
+            var next = function(){
+                $slideBox.animate({"left": -cardWidth}, speed, function(){
+                    $slideBox.css("left", 0);
+                    var $firstCard = $(".card", $currentTabItem).eq(0);
+                    $currentTabItem.append($firstCard.clone(true));
+                    $firstCard.remove();
+                    isSlide = false;
+                    autoplay();
+                });
+            };
+
+            var auto = function(){
+                isSlide = true;
+                $slideBox.animate({"left": -cardWidth}, speed, function(){
+                    $slideBox.css("left", 0);
+                    var $firstCard = $(".card", $currentTabItem).eq(0);
+                    $currentTabItem.append($firstCard.clone(true));
+                    $firstCard.remove();
+                    isSlide = false;
+                });
+            };
+
+            var autoplay = function(){
+                timer = setInterval(auto, duration + speed);
+            };
+
+            // auto
+            autoplay();
+
+            // bind
+            $prev.off("click").on("click", function () {
+                if(isSlide) return;
+
+                clearInterval(timer);
+                isSlide = true;
+                next();
+            });
+
+            $next.off("click").on("click", function () {
+                if(isSlide) return;
+
+                clearInterval(timer);
+                isSlide = true;
+                prev();
+            });
+
+        }
+
+        $(function(){
+            tab();
+        })
+
+    </script>
+
+</body>
+</html>
